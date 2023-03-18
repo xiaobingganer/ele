@@ -91,9 +91,72 @@
         }
       </p>
     </el-tab-pane>
-    <el-tab-pane label="函数" name="third"> </el-tab-pane>
-    <el-tab-pane label="运算" name="fourth">运算</el-tab-pane>
-    <el-tab-pane label="转义" name="five">运算</el-tab-pane>
+    <el-tab-pane label="函数" name="third">
+      <p>
+        Less 内置了多种函数用于转换颜色、处理字符串、算术运算等。这些函数在Less
+        函数手册中有详细介绍。 函数的用法非常简单。下面这个例子将介绍如何利用
+        percentage 函数将 0.5 转换为 50%，将颜色饱和度增加 5%，以及颜色亮度降低
+        25% 并且色相值增加 8 等用法：
+      </p>
+      <p>
+        @base: #f04615; @width: 0.5; .class { width: percentage(@width); //
+        returns `50%` color: saturate(@base, 5%); background-color:
+        spin(lighten(@base, 25%), 8); }
+      </p>
+    </el-tab-pane>
+    <el-tab-pane label="命名空间和访问符" name="fourth">
+      <p>
+        希望对混合（mixins）进行分组。你可以用 Less
+        更直观地实现这一需求。假设你希望将一些混合（mixins）和变量置于 #bundle
+        之下，为了以后方便重用或分发：
+      </p>
+      <p>
+        #bundle() { .button { display: block; border: 1px solid black;
+        background-color: grey; &:hover { background-color: white; } } .tab {
+        ... } .citation { ... } }
+      </p>
+      <p>
+        如果我们希望把 .button 类混合到 #header a 中，我们可以这样做： #header a
+        { color: orange; #bundle.button(); // 还可以书写为 #bundle > .button
+        形式 } 注意：如果不希望它们出现在输出的 CSS 中，例如 #bundle .tab，请将
+        () 附加到命名空间（例如 #bundle()）后面。
+      </p>
+    </el-tab-pane>
+    <el-tab-pane label="作用域" name="five">
+      <baseText title="作用域">
+        <div>
+          <p class="selecClass">
+            Less 中的作用域与 CSS
+            中的作用域非常类似。首先在本地查找变量和混合（mixins），如果找不到，则从“父”级作用域继承。
+          </p>
+          <p class="color">
+            @var: red; #page { @var: white; #header { color: @var; // white }
+          </p>
+          <p class="BL">
+            与 CSS
+            自定义属性一样，混合（mixin）和变量的定义不必在引用之前事先定义。因此，下面的
+            Less 代码示例和上面的代码示例是相同的：
+          </p>
+          <p>
+            @var: red; #page { #header { color: @var; // white } @var: white; }
+          </p>
+        </div>
+      </baseText>
+      <baseText title="避免编译">
+        <div>
+          <p class="selecClass">
+            通过加引号可以避免 Less 编译，直接把内容输出到 CSS 中
+          </p>
+          <p class="color">
+            .banner .inline .header { width: '100px + 100px'; height: 100px +
+            100px; }
+          </p>
+          <p class="BY">
+            .banner .inline .header { width: '100px + 100px'; height: 200px; }
+          </p>
+        </div>
+      </baseText>
+    </el-tab-pane>
     <el-tab-pane label="函数" name="six">运算</el-tab-pane>
     <el-tab-pane label="命名空间和访问符" name="seven">运算</el-tab-pane>
   </el-tabs>
@@ -139,20 +202,20 @@ export default {
 @list1: 14px, 15px, 16px, 18px;
 
 //变量当选择器
-@select:selecClass;
-.@{select}{
-color: skyblue;
+@select: selecClass;
+.@{select} {
+  color: skyblue;
 }
 //变量当属性
-@props:color;
-.@{props}{
-  @{props}:skyblue;
+@props: color;
+.@{props} {
+  @{props}: skyblue;
 }
 
 //变量作为变量名使用
-@size:12px;
-@fontSize:size;
-.BL{
+@size: 12px;
+@fontSize: size;
+.BL {
   font-size: @@fontSize;
 }
 
@@ -209,26 +272,44 @@ color: skyblue;
 @linkTypeName: executed, stop, executing, waiting, overtime, warning;
 // 类名对应颜色
 @linkType: @executed, @stop, @executing, @waiting, @overtime, @warning;
-
-.staClass(@class,@color) {
+@fontPx: 10px, 12px, 14px, 16px, 18px, 20px;
+/* .staClass(@class,@color) {
   .@{class} {
     //注意类名要{}里
     color: rgba(@color);
   }
+} */
+.StaClass(@class,@color) {
+  .@{class} {
+    color: rgba(@color);
+  }
 }
 @len: length(@linkTypeName);
-.loop(@i) when(@i<=@len) {
+/* .loop(@i) when(@i<=@len) {
   // .staClass(extract(@linkTypeName, @i), extract(@linkType, @i));
   h1:nth-child(@{i}) {
     color: rgba(extract(@linkType, @i));
   }
   .loop(@i+1);
-}
+} */
 // .loop(1); // 这个一定要写，不然不会调用
+
+.loop(@i) when(@i<=@len) {
+  .StaClass(extract(@linkTypeName, @i), extract(@linkType, @i));
+  .loop(@i+1);
+}
+.loop(1);
 //each和上面的loop效果一样
-each(@linkType,{
+/* each(@linkType,{
   h1:nth-child(@{index}) {
     color: rgba(extract(@linkType, @index));
+    font-size: extract(@fontPx,@index);
   }
-})
+}) */
+
+//避免编译
+.BY {
+  font-size: "10px+20px";
+  font-weight: 600;
+}
 </style>
