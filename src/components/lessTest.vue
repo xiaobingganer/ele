@@ -279,11 +279,6 @@ export default {
     color: rgba(@color);
   }
 } */
-.StaClass(@class,@color) {
-  .@{class} {
-    color: rgba(@color);
-  }
-}
 @len: length(@linkTypeName);
 /* .loop(@i) when(@i<=@len) {
   // .staClass(extract(@linkTypeName, @i), extract(@linkType, @i));
@@ -294,11 +289,12 @@ export default {
 } */
 // .loop(1); // 这个一定要写，不然不会调用
 
-.loop(@i) when(@i<=@len) {
-  .StaClass(extract(@linkTypeName, @i), extract(@linkType, @i));
-  .loop(@i+1);
-}
-.loop(1);
+each(@linkTypeName,{
+  .@{value}{
+    color:rgba(extract(@linkType,@index));
+    font-size: extract(@fontPx,@index);
+  }
+});
 //each和上面的loop效果一样
 /* each(@linkType,{
   h1:nth-child(@{index}) {
@@ -306,6 +302,7 @@ export default {
     font-size: extract(@fontPx,@index);
   }
 }) */
+
 
 //避免编译
 .BY {
